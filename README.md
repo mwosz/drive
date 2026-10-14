@@ -12,6 +12,7 @@ Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hostin
 2. Struktura katalogów na serwerze:
    ```
    /usr/home/LOGIN/domains/notes.wosz.pl/
+   ├── user.js        (skrypt do zarządzania użytkownikami)
    ├── users.json     (hasła użytkowników — NIE w public_nodejs!)
    ├── data/          (dane WebDAV — NIE w public_nodejs!)
    └── public_nodejs/
@@ -30,31 +31,34 @@ Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hostin
 
 ## Użytkownicy
 
-Domyślni użytkownicy (hasła w formacie `login:hasło`):
+### Dodawanie użytkowników
+
+Użyj skryptu `user.js` do dodawania lub aktualizacji użytkowników:
+
+```bash
+node user.js --user <login> --password <hasło>
+```
+
+Przykład:
+```bash
+node user.js --user joplin --password tajnehaslo
+```
+
+Skrypt automatycznie generuje losowy salt i hashuje hasło (pbkdf2, 100 000 iteracji, SHA-512), a następnie zapisuje użytkownika w pliku `users.json`. Jeśli użytkownik już istnieje, jego hasło zostanie zaktualizowane.
+
+### Domyślni użytkownicy
 
 | Login | Hasło |
 |-------|-------|
-| joplin | joplin |
-
-Aby dodać nowego użytkownika, wygeneruj hash hasła:
-
-```bash
-node -e "
-const crypto = require('crypto');
-const password = 'TWOJE_HASLO';
-const salt = crypto.randomBytes(16).toString('hex');
-const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
-console.log(JSON.stringify({user: 'LOGIN', salt, hash}, null, 2));
-"
-```
+| user | user |
 
 ## Konfiguracja Joplin
 
 W Joplin: **Preferencje** → **Synchronizacja**:
 - **Typ synchronizacji**: WebDAV
-- **Serwer WebDAV**: `https://notes.wosz.pl`
+- **Serwer WebDAV**: `https://drive.wosz.pl`
 - **Nazwa użytkownika**: `joplin`
-- **Hasło**: `joplin`
+- **Hasło**: `USTAWIONE_HASLO`
 
 ## Zmienne środowiskowe
 
