@@ -1,0 +1,10 @@
+# Include only these files/directories
+!README.md
+!users.json.example
+!public_nodejs/
+
+# Ignore IDE directories
+.idea/
+
+# Ignore everything else
+*
