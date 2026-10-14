@@ -1,11 +1,7 @@
-# Include only these files/directories
-!README.md
-!users.json.example
-!user.js
-!public_nodejs/
 
 # Ignore IDE directories
 .idea/
-
+node_modules
+users.json
 # Ignore everything else
 *
