@@ -3,15 +3,44 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 
-// __dirname is public_nodejs/ when running with tsx; data and users.json are in ../
-const PUBLIC_NODEJS_DIR = __dirname;
+// After compilation: __dirname is dist/; go up to public_nodejs/
+const PUBLIC_NODEJS_DIR = path.join(__dirname, '..');
+
+/**
+ * Find the project root by walking up from public_nodejs/ until we find 'users.json'.
+ * Handles different deployment structures:
+ *   - Local dev: public_nodejs/../users.json  (project root = parent of public_nodejs)
+ *   - Server: domains/drive.wosz.pl/public_nodejs/ -> users.json may be at drive.wosz.pl/ or higher
+ */
+function findProjectRoot(): string {
+  let current = PUBLIC_NODEJS_DIR;
+  const maxDepth = 10;
+  let depth = 0;
+  while (depth < maxDepth) {
+    const candidate = path.join(current, 'users.json');
+    if (fs.existsSync(candidate)) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) break; // reached filesystem root
+    current = parent;
+    depth++;
+  }
+  // Fallback: one level up from public_nodejs
+  return path.dirname(PUBLIC_NODEJS_DIR);
+}
+
+const PROJECT_ROOT = findProjectRoot();
 
 // Resolve the real path of ROOT_DIR to prevent symlink escapes at the root level
-export const RESOLVED_ROOT_DIR = fs.realpathSync(
-  process.env.WEBDAV_ROOT || path.join(PUBLIC_NODEJS_DIR, '..', 'data')
-);
+const ROOT_DIR = process.env.WEBDAV_ROOT || path.join(PROJECT_ROOT, 'data');
+// Ensure the directory exists before calling realpathSync (fails with ENOENT otherwise)
+if (!fs.existsSync(ROOT_DIR)) {
+  fs.mkdirSync(ROOT_DIR, { recursive: true });
+}
+export const RESOLVED_ROOT_DIR = fs.realpathSync(ROOT_DIR);
 
-const USERS_FILE = path.join(PUBLIC_NODEJS_DIR, '..', 'users.json');
+const USERS_FILE = path.join(PROJECT_ROOT, 'users.json');
 
 // Load users from file
 export function loadUsers(): Array<{ user: string; salt: string; hash: string }> {

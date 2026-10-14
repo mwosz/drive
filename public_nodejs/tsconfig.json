@@ -2,6 +2,8 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -9,6 +11,6 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["action/**/*.ts", "utils.ts"],
-  "exclude": ["node_modules"]
+  "include": ["action/**/*.ts", "utils.ts", "app.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -2,9 +2,10 @@
   "name": "notes",
   "version": "1.0.0",
   "description": "WebDAV server for Joplin notes sync",
-  "main": "app.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node app.js"
+    "build": "tsc",
+    "start": "node dist/app.js"
   },
   "private": true,
   "devDependencies": {
