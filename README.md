@@ -6,28 +6,63 @@ Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hostin
 
 - Node.js v18+
 
-## Konfiguracja na mydevil.net
+## Instalacja na serwerze mydevil.net
 
-1. W panelu DevilWEB dodaj stronę WWW typu **Node.js** dla domeny `notes.wosz.pl`
-2. Struktura katalogów na serwerze:
-   ```
-   /usr/home/LOGIN/domains/notes.wosz.pl/
-   ├── user.js        (skrypt do zarządzania użytkownikami)
-   ├── users.json     (hasła użytkowników — NIE w public_nodejs!)
-   ├── data/          (dane WebDAV — NIE w public_nodejs!)
-   └── public_nodejs/
-       ├── app.js
-       └── package.json
-   ```
-3. Zaloguj się przez SSH i uruchom:
-   ```bash
-   cd /usr/home/LOGIN/domains/notes.wosz.pl/public_nodejs
-   npm install
-   ```
-4. Restart aplikacji przez panel DevilWEB lub:
-   ```bash
-   devil www restart notes.wosz.pl
-   ```
+### 1. Przygotowanie lokalnie
+
+Przed wgraniem na serwer, skompiluj projekt lokalnie:
+
+```bash
+cd public_nodejs
+npm install
+npm run build
+```
+
+Kompilacja TypeScript wygeneruje folder `dist/` z plikami JavaScript gotowymi do uruchomienia.
+
+### 2. Dodanie strony WWW
+
+W panelu DevilWEB dodaj stronę WWW typu **Node.js** dla domeny (np. `drive.DOMAIN.pl`).
+
+### 3. Przekopiowanie plików na serwer
+
+Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
+
+```
+~/domains/DOMAIN/
+├── user.js        (skrypt do zarządzania użytkownikami)
+├── users.json     (hasła użytkowników — NIE w public_nodejs!)
+├── data/          (dane WebDAV — NIE w public_nodejs!)
+└── public_nodejs/
+    ├── package.json
+    └── dist/
+        ├── app.js
+        ├── action/
+        └── utils.js
+```
+
+Można to zrobić np. przez `scp` lub `rsync`:
+
+```bash
+scp -r public_nodejs/dist user.js users.json data/ LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
+```
+
+### 4. Instalacja zależności na serwerze
+
+Zaloguj się przez SSH i zainstaluj zależności:
+
+```bash
+cd ~/domains/DOMAIN/public_nodejs
+npm install --production
+```
+
+### 5. Restart aplikacji
+
+Restart aplikacji przez panel DevilWEB lub:
+
+```bash
+devil www restart DOMAIN
+```
 
 ## Użytkownicy
 
@@ -56,7 +91,7 @@ Skrypt automatycznie generuje losowy salt i hashuje hasło (pbkdf2, 100 000 iter
 
 W Joplin: **Preferencje** → **Synchronizacja**:
 - **Typ synchronizacji**: WebDAV
-- **Serwer WebDAV**: `https://drive.wosz.pl`
+- **Serwer WebDAV**: `https://drive.DOMAIN.pl`
 - **Nazwa użytkownika**: `joplin`
 - **Hasło**: `USTAWIONE_HASLO`
 
