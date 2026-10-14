@@ -35,10 +35,9 @@ Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
 ├── data/          (dane WebDAV — NIE w public_nodejs!)
 └── public_nodejs/
     ├── package.json
-    └── dist/
-        ├── app.js
-        ├── action/
-        └── utils.js
+    ├── app.js
+    ├── action/
+    └── utils.js
 ```
 
 Można to zrobić np. przez `scp` lub `rsync`:
