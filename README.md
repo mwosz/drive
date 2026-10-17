@@ -16,9 +16,10 @@ A lightweight WebDAV server for Joplin notes synchronization, optimized for myde
 
 ### 1. Local Preparation
 
-Before uploading to the server, build the project locally:
+Before uploading to the server, copy `users.json.example` to `users.json` and build the project locally:
 
 ```bash
+cp users.json.example users.json
 pnpm install
 pnpm run build
 ```

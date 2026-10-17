@@ -10,6 +10,7 @@
     "test:unit": "jest --config jest.config.js --testPathPatterns=.unit.test.ts$",
     "test:integration": "jest --config jest.config.js --testPathPatterns=/tests/"
   },
+  "license": "MIT",
   "private": true,
   "devDependencies": {
     "@swc/core": "^1.16.18",

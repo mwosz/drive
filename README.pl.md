@@ -16,9 +16,10 @@ Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hostin
 
 ### 1. Przygotowanie lokalnie
 
-Przed wgraniem na serwer, skompiluj projekt lokalnie:
+Przed wgraniem na serwer, przekopiuj `users.json.example` do `users.json` i skompiluj projekt lokalnie:
 
 ```bash
+cp users.json.example users.json
 pnpm install
 pnpm run build
 ```
