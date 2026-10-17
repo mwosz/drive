@@ -60,6 +60,18 @@ export function isDirectory(fullPath: string): boolean {
 }
 
 /**
+ * Checks if a path is a directory using async fs.stat.
+ */
+export function isDirectoryAsync(
+  fullPath: string,
+  callback: (isDir: boolean) => void
+): void {
+  fs.stat(fullPath, (err, stats) => {
+    callback(!err && stats.isDirectory());
+  });
+}
+
+/**
  * Sends a 500 Internal Server Error response.
  */
 export function sendInternalServerError(res: http.ServerResponse): void {

@@ -1,0 +1,22 @@
+{
+  "name": "drive",
+  "version": "1.0.0",
+  "description": "WebDAV server for Joplin notes sync",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "test": "jest --config jest.config.js",
+    "test:unit": "jest --config jest.config.js --testPathPatterns=.unit.test.ts$",
+    "test:integration": "jest --config jest.config.js --testPathPatterns=/tests/"
+  },
+  "private": true,
+  "devDependencies": {
+    "@swc/core": "^1.16.18",
+    "@swc/jest": "^0.2.39",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.6.5",
+    "jest": "^30.5.2",
+    "typescript": "^7.0.2"
+  }
+}

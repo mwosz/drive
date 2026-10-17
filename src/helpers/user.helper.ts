@@ -37,10 +37,15 @@ export const RESOLVED_ROOT_DIR = fs.realpathSync(ROOT_DIR);
 /**
  * Get the per-user root directory for a given username.
  */
-export function getUserRoot(username: string): string {
+export function getUserRoot(username: string, callback: (userDir: string) => void): void {
   const userDir = path.join(RESOLVED_ROOT_DIR, username);
-  if (!fs.existsSync(userDir)) {
-    fs.mkdirSync(userDir, { recursive: true });
-  }
-  return fs.realpathSync(userDir);
+  fs.mkdir(userDir, { recursive: true }, (err) => {
+    if (err) {
+      callback(userDir);
+      return;
+    }
+    fs.realpath(userDir, (err, realPath) => {
+      callback(err ? userDir : realPath);
+    });
+  });
 }

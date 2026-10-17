@@ -13,9 +13,8 @@ Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hostin
 Przed wgraniem na serwer, skompiluj projekt lokalnie:
 
 ```bash
-cd public_nodejs
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
 Kompilacja TypeScript wygeneruje folder `dist/` z plikami JavaScript gotowymi do uruchomienia.
@@ -31,27 +30,27 @@ Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
 ```
 ~/domains/DOMAIN/
 ├── user.js        (skrypt do zarządzania użytkownikami)
-├── users.json     (hasła użytkowników — NIE w public_nodejs!)
-├── data/          (dane WebDAV — NIE w public_nodejs!)
-└── public_nodejs/
-    ├── package.json
-    ├── app.js
-    ├── action/
-    └── utils.js
+├── users.json     (hasła użytkowników)
+├── data/          (dane WebDAV)
+├── dist/          (skompilowany kod aplikacji)
+│   ├── app.js
+│   ├── action/
+│   └── helpers/
+└── package.json   (zależności Node.js)
 ```
 
 Można to zrobić np. przez `scp` lub `rsync`:
 
 ```bash
-scp -r public_nodejs/dist user.js users.json data/ LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
+scp -r dist user.js users.json data/ package.json LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
 ```
 
 ### 4. Instalacja zależności na serwerze
 
-Zaloguj się przez SSH i zainstaluj zależności:
+Zaloguj się przez SSH i zainstaluj zależności (serwer mydevil.net używa `npm`):
 
 ```bash
-cd ~/domains/DOMAIN/public_nodejs
+cd ~/domains/DOMAIN
 npm install --production
 ```
 

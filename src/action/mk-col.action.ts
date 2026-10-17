@@ -1,0 +1,53 @@
+import http = require('http');
+import * as fs from 'fs';
+import * as path from 'path';
+import { getFullPath } from '../helpers/path.helper';
+import { sendCreated, sendInternalServerError } from '../helpers/response.helper';
+
+export function handleMkCol(req: http.IncomingMessage, res: http.ServerResponse): void {
+  getFullPath(req, (fullPath) => {
+    if (fullPath === null) {
+      res.writeHead(403, { 'Content-Type': 'text/plain' });
+      res.end('Forbidden');
+      return;
+    }
+
+    fs.stat(fullPath, (err: NodeJS.ErrnoException | null, stats: fs.Stats) => {
+      if (err === null && stats.isDirectory()) {
+        res.writeHead(405, { 'Content-Type': 'text/plain' });
+        res.end('Method Not Allowed: Collection already exists');
+        return;
+      }
+      if (err === null) {
+        res.writeHead(405, { 'Content-Type': 'text/plain' });
+        res.end('Method Not Allowed: Non-collection exists');
+        return;
+      }
+
+      const parent = path.dirname(fullPath);
+      fs.stat(parent, (parentErr) => {
+        if (parentErr) {
+          res.writeHead(409, { 'Content-Type': 'text/plain' });
+          res.end('Conflict: Parent collection does not exist');
+          return;
+        }
+
+        fs.mkdir(fullPath, (err: NodeJS.ErrnoException | null) => {
+          if (err) {
+            if (err.code === 'EEXIST') {
+              res.writeHead(405, { 'Content-Type': 'text/plain' });
+              res.end('Method Not Allowed: Collection already exists');
+            } else if (err.code === 'EACCES') {
+              res.writeHead(403, { 'Content-Type': 'text/plain' });
+              res.end('Forbidden');
+            } else {
+              sendInternalServerError(res);
+            }
+            return;
+          }
+          sendCreated(res);
+        });
+      });
+    });
+  });
+}

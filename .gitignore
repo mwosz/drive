@@ -2,6 +2,7 @@
 node_modules/
 dist/
 users.json
+.npmrc
 
 # Ignore everything in data/ except .gitkeep
 data/*

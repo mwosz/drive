@@ -19,11 +19,9 @@ export function getDestinationHeader(req: http.IncomingMessage, res: http.Server
 /**
  * Ensures the parent directory of the destination path exists, creating it recursively if needed.
  */
-export function ensureDestDir(destPath: string): void {
+export function ensureDestDir(destPath: string, callback: (err: Error | null) => void): void {
   const destDir = path.dirname(destPath);
-  if (!fs.existsSync(destDir)) {
-    fs.mkdirSync(destDir, { recursive: true });
-  }
+  fs.mkdir(destDir, { recursive: true }, callback);
 }
 
 /**
