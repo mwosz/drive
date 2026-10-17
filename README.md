@@ -29,20 +29,24 @@ Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
 
 ```
 ~/domains/DOMAIN/
-├── user.js        (skrypt do zarządzania użytkownikami)
+├── README.md
 ├── users.json     (hasła użytkowników)
 ├── data/          (dane WebDAV)
-├── dist/          (skompilowany kod aplikacji)
-│   ├── app.js
-│   ├── action/
-│   └── helpers/
-└── package.json   (zależności Node.js)
+├── logs/          (logi aplikacji)
+└── public_nodejs/ (aplikacja Node.js)
+    ├── app.js
+    ├── action/
+    ├── helpers/
+    ├── node_modules/
+    ├── package.json
+    └── package-lock.json
 ```
 
 Można to zrobić np. przez `scp` lub `rsync`:
 
 ```bash
-scp -r dist user.js users.json data/ package.json LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
+scp -r dist/* package.json LOGIN@ssh.mydevil.net:~/domains/DOMAIN/public_nodejs/
+scp users.json data/ LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
 ```
 
 ### 4. Instalacja zależności na serwerze
@@ -50,7 +54,7 @@ scp -r dist user.js users.json data/ package.json LOGIN@ssh.mydevil.net:~/domain
 Zaloguj się przez SSH i zainstaluj zależności (serwer mydevil.net używa `npm`):
 
 ```bash
-cd ~/domains/DOMAIN
+cd ~/domains/DOMAIN/public_nodejs
 npm install --production
 ```
 
