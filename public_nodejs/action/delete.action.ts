@@ -1,6 +1,9 @@
 import http = require('http');
 import * as fs from 'fs';
-import { getFullPath, getUserRoot, rmDir } from '../utils';
+import { getFullPath } from '../helpers/path.helper';
+import { getUserRoot } from '../helpers/user.helper';
+import { rmDir } from '../helpers/directory.helper';
+import { deleteDirectory, deleteFile } from '../helpers/response.helper';
 
 export function handleDelete(req: http.IncomingMessage, res: http.ServerResponse): void {
   const fullPath = getFullPath(req);
@@ -25,25 +28,9 @@ export function handleDelete(req: http.IncomingMessage, res: http.ServerResponse
     }
 
     if (stats.isDirectory()) {
-      rmDir(fullPath, (err: Error | null) => {
-        if (err) {
-          res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end('Internal Server Error');
-          return;
-        }
-        res.writeHead(204);
-        res.end();
-      });
+      deleteDirectory(fullPath, res, rmDir);
     } else {
-      fs.unlink(fullPath, (err) => {
-        if (err) {
-          res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end('Internal Server Error');
-          return;
-        }
-        res.writeHead(204);
-        res.end();
-      });
+      deleteFile(fullPath, res);
     }
   });
 }

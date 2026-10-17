@@ -1,7 +1,8 @@
 import http = require('http');
 import * as fs from 'fs';
 import * as path from 'path';
-import { getFullPath } from '../utils';
+import { getFullPath } from '../helpers/path.helper';
+import { sendCreated, sendInternalServerError } from '../helpers/response.helper';
 
 export function handleMkCol(req: http.IncomingMessage, res: http.ServerResponse): void {
   const fullPath = getFullPath(req);
@@ -39,13 +40,11 @@ export function handleMkCol(req: http.IncomingMessage, res: http.ServerResponse)
           res.writeHead(403, { 'Content-Type': 'text/plain' });
           res.end('Forbidden');
         } else {
-          res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end('Internal Server Error');
+          sendInternalServerError(res);
         }
         return;
       }
-      res.writeHead(201);
-      res.end();
+      sendCreated(res);
     });
   });
 }

@@ -4,10 +4,10 @@ import * as path from 'path';
 import {
   getFullPath,
   getPath,
-  encodeWebDavHref,
-  getHeaders,
-  getContentType
-} from '../utils';
+  encodeWebDavHref
+} from '../helpers/path.helper';
+import { getHeaders, getContentType } from '../helpers/http.helper';
+import { isDirectory } from '../helpers/response.helper';
 
 function handleRangeRequest(
   req: http.IncomingMessage,
@@ -41,7 +41,7 @@ function handleDirectoryListing(
   const entries = fs.readdirSync(fullPath);
 
   let html = `<!DOCTYPE html>
-<html><head><title>Index of ${decodedPath}</title></head>
+<html lang="pl"><head><title>Index of ${decodedPath}</title></head>
 <body>
 <h1>Index of ${decodedPath}</h1>
 <ul>`;
@@ -53,7 +53,7 @@ function handleDirectoryListing(
 
   for (const entry of entries) {
     const entryFullPath = path.join(fullPath, entry);
-    const isDir = fs.statSync(entryFullPath).isDirectory();
+    const isDir = isDirectory(entryFullPath);
     const entryHref = encodeWebDavHref(decodedPath + (decodedPath.endsWith('/') ? '' : '/') + entry);
     html += `<li><a href="${entryHref}${isDir ? '/' : ''}">${entry}${isDir ? '/' : ''}</a></li>`;
   }

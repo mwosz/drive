@@ -12,7 +12,8 @@ import { handleCopy } from './action/copy.action';
 import { handleMove } from './action/move.action';
 
 // Import shared utilities
-import { requireAuth, RESOLVED_ROOT_DIR } from './utils';
+import { requireAuth } from './helpers/auth.helper';
+import { RESOLVED_ROOT_DIR } from './helpers/user.helper';
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';

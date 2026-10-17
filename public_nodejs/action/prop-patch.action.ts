@@ -1,6 +1,7 @@
 import http = require('http');
 import * as fs from 'fs';
-import { getFullPath, getPath, encodeWebDavHref } from '../utils';
+import { getFullPath, getPath, encodeWebDavHref } from '../helpers/path.helper';
+import { isDirectory } from '../helpers/response.helper';
 
 export function handlePropPatch(req: http.IncomingMessage, res: http.ServerResponse): void {
   const fullPath = getFullPath(req);
@@ -19,7 +20,7 @@ export function handlePropPatch(req: http.IncomingMessage, res: http.ServerRespo
 
     const decodedPath = getPath(req);
     const href = encodeWebDavHref(decodedPath);
-    const isDir = fs.statSync(fullPath).isDirectory();
+    const isDir = isDirectory(fullPath);
     const hrefWithSlash = isDir && !href.endsWith('/') ? href + '/' : href;
 
     const response = `<?xml version="1.0" encoding="utf-8"?>

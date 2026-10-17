@@ -1,5 +1,4 @@
 import http = require('http');
-import { getHeaders } from '../utils';
 
 export function handleOptions(req: http.IncomingMessage, res: http.ServerResponse): void {
   res.writeHead(200, {

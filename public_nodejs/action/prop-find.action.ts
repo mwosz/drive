@@ -1,7 +1,9 @@
 import http = require('http');
 import * as fs from 'fs';
 import * as path from 'path';
-import { getFullPath, getPath, encodeWebDavHref, buildPropStat } from '../utils';
+import { getFullPath, getPath, encodeWebDavHref } from '../helpers/path.helper';
+import { buildPropStat } from '../helpers/metadata.helper';
+import { isDirectory } from '../helpers/response.helper';
 
 export function handlePropFind(req: http.IncomingMessage, res: http.ServerResponse): void {
   const fullPath = getFullPath(req);
@@ -31,7 +33,7 @@ export function handlePropFind(req: http.IncomingMessage, res: http.ServerRespon
         const entries = fs.readdirSync(fullPath);
         for (const entry of entries) {
           const entryFullPath = path.join(fullPath, entry);
-          const isDir = fs.statSync(entryFullPath).isDirectory();
+          const isDir = isDirectory(entryFullPath);
           const entryDecodedPath = decodedPath.endsWith('/') ? `${decodedPath}${entry}` : `${decodedPath}/${entry}`;
           const entryHref = encodeWebDavHref(entryDecodedPath);
           const entryHrefFinal = isDir ? (entryHref.endsWith('/') ? entryHref : entryHref + '/') : entryHref;

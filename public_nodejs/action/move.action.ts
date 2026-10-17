@@ -1,13 +1,14 @@
 import http = require('http');
 import * as fs from 'fs';
-import * as path from 'path';
-import { getFullPath, getDestinationPath, copyDir, rmDir } from '../utils';
+import { getFullPath, getDestinationPath } from '../helpers/path.helper';
+import { copyDir, rmDir } from '../helpers/directory.helper';
+import { getDestinationHeader, ensureDestDir, streamFileMove } from '../helpers/file_stream.helper';
+import { checkOverwritePrecondition } from '../helpers/file_stat.helper';
+import { sendCreated, sendInternalServerError } from '../helpers/response.helper';
 
 export function handleMove(req: http.IncomingMessage, res: http.ServerResponse): void {
-  const destination = req.headers.destination as string | undefined;
-  if (!destination) {
-    res.writeHead(400, { 'Content-Type': 'text/plain' });
-    res.end('Bad Request: Destination header required');
+  const destination = getDestinationHeader(req, res);
+  if (destination === null) {
     return;
   }
 
@@ -25,7 +26,7 @@ export function handleMove(req: http.IncomingMessage, res: http.ServerResponse):
     return;
   }
 
-  const destDir = path.dirname(destPath);
+  ensureDestDir(destPath);
 
   fs.stat(sourcePath, (err: NodeJS.ErrnoException | null, stats: fs.Stats) => {
     if (err) {
@@ -35,22 +36,11 @@ export function handleMove(req: http.IncomingMessage, res: http.ServerResponse):
     }
 
     fs.stat(destPath, (destErr: NodeJS.ErrnoException | null, destStats: fs.Stats) => {
-      if (destErr === null) {
-        const overwrite = (typeof req.headers.overwrite === 'string' ? req.headers.overwrite : 'F') || 'F';
-        if (overwrite === 'F') {
-          res.writeHead(412, { 'Content-Type': 'text/plain' });
-          res.end('Precondition Failed: Destination exists and Overwrite=F');
-          return;
-        }
-        if (destStats.isDirectory() !== stats.isDirectory()) {
-          res.writeHead(409, { 'Content-Type': 'text/plain' });
-          res.end('Conflict: Cannot move between collection and non-collection');
-          return;
-        }
-      }
+      const destExists = destErr === null;
+      const destIsDir = destExists ? destStats.isDirectory() : false;
 
-      if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
+      if (checkOverwritePrecondition(req, res, destExists, stats.isDirectory(), destIsDir)) {
+        return;
       }
 
       fs.rename(sourcePath, destPath, (err: NodeJS.ErrnoException | null) => {
@@ -58,39 +48,23 @@ export function handleMove(req: http.IncomingMessage, res: http.ServerResponse):
           if (stats.isDirectory()) {
             copyDir(sourcePath, destPath, (err3: Error | null) => {
               if (err3) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Internal Server Error');
+                sendInternalServerError(res);
                 return;
               }
               rmDir(sourcePath, (err4: Error | null) => {
                 if (err4) {
-                  res.writeHead(500, { 'Content-Type': 'text/plain' });
-                  res.end('Internal Server Error');
+                  sendInternalServerError(res);
                   return;
                 }
-                res.writeHead(201);
-                res.end();
+                sendCreated(res);
               });
             });
           } else {
-            const rs = fs.createReadStream(sourcePath);
-            const ws = fs.createWriteStream(destPath);
-            rs.pipe(ws);
-            ws.on('finish', () => {
-              fs.unlink(sourcePath, () => {
-                res.writeHead(201);
-                res.end();
-              });
-            });
-            ws.on('error', () => {
-              res.writeHead(500, { 'Content-Type': 'text/plain' });
-              res.end('Internal Server Error');
-            });
+            streamFileMove(sourcePath, destPath, res);
           }
           return;
         }
-        res.writeHead(201);
-        res.end();
+        sendCreated(res);
       });
     });
   });

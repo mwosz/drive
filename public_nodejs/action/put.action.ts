@@ -2,7 +2,9 @@ import http = require('http');
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import { getFullPath, parseOcMtime } from '../utils';
+import { getFullPath } from '../helpers/path.helper';
+import { parseOcMtime } from '../helpers/metadata.helper';
+import { sendInternalServerError } from '../helpers/response.helper';
 
 export function handlePut(req: http.IncomingMessage, res: http.ServerResponse): void {
   const fullPath = getFullPath(req);
@@ -53,7 +55,6 @@ export function handlePut(req: http.IncomingMessage, res: http.ServerResponse): 
     res.end();
   });
   writeStream.on('error', () => {
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('Internal Server Error');
+    sendInternalServerError(res);
   });
 }

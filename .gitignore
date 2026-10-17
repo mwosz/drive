@@ -1,7 +1,9 @@
-
-# Ignore IDE directories
 .idea/
-node_modules
+node_modules/
+dist/
 users.json
-# Ignore everything else
-*
+
+# Ignore everything in data/ except .gitkeep
+data/*
+!data/.gitkeep
+
