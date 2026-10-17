@@ -1,39 +1,45 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+
 # WebDAV Server for Joplin
 
-Lekki serwer WebDAV do synchronizacji notatek Joplin, zoptymalizowany pod hosting mydevil.net.
+A lightweight WebDAV server for Joplin notes synchronization, optimized for mydevil.net hosting.
 
-## Wymagania
+[🇵🇱 Polska wersja](README.pl.md)
+
+## Requirements
 
 - Node.js v18+
 
-## Instalacja na serwerze mydevil.net
+## Installation on mydevil.net Server
 
-### 1. Przygotowanie lokalnie
+### 1. Local Preparation
 
-Przed wgraniem na serwer, skompiluj projekt lokalnie:
+Before uploading to the server, build the project locally:
 
 ```bash
 pnpm install
 pnpm run build
 ```
 
-Kompilacja TypeScript wygeneruje folder `dist/` z plikami JavaScript gotowymi do uruchomienia.
+The TypeScript compilation will generate the `dist/` folder with JavaScript files ready to run.
 
-### 2. Dodanie strony WWW
+### 2. Add a Web Page
 
-W panelu DevilWEB dodaj stronę WWW typu **Node.js** dla domeny (np. `drive.DOMAIN.pl`).
+In the DevilWEB panel, add a **Node.js** web page for your domain (e.g. `drive.DOMAIN.pl`).
 
-### 3. Przekopiowanie plików na serwer
+### 3. Copy Files to the Server
 
-Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
+Copy the project contents to the server, preserving the following structure:
 
 ```
 ~/domains/DOMAIN/
 ├── README.md
-├── users.json     (hasła użytkowników)
-├── data/          (dane WebDAV)
-├── logs/          (logi aplikacji)
-└── public_nodejs/ (aplikacja Node.js)
+├── users.json     (user passwords)
+├── data/          (WebDAV data)
+├── logs/          (application logs)
+└── public_nodejs/ (Node.js application)
     ├── app.js
     ├── action/
     ├── helpers/
@@ -42,69 +48,69 @@ Przekopiuj zawartość projektu na serwer, zachowując poniższą strukturę:
     └── package-lock.json
 ```
 
-Można to zrobić np. przez `scp` lub `rsync`:
+You can do this using `scp` or `rsync`:
 
 ```bash
 scp -r dist/* package.json LOGIN@ssh.mydevil.net:~/domains/DOMAIN/public_nodejs/
 scp users.json data/ LOGIN@ssh.mydevil.net:~/domains/DOMAIN/
 ```
 
-### 4. Instalacja zależności na serwerze
+### 4. Install Dependencies on the Server
 
-Zaloguj się przez SSH i zainstaluj zależności (serwer mydevil.net używa `npm`):
+Log in via SSH and install dependencies (mydevil.net server uses `npm`):
 
 ```bash
 cd ~/domains/DOMAIN/public_nodejs
 npm install --production
 ```
 
-### 5. Restart aplikacji
+### 5. Restart the Application
 
-Restart aplikacji przez panel DevilWEB lub:
+Restart the application via the DevilWEB panel or:
 
 ```bash
 devil www restart DOMAIN
 ```
 
-## Użytkownicy
+## Users
 
-### Dodawanie użytkowników
+### Adding Users
 
-Użyj skryptu `user.js` do dodawania lub aktualizacji użytkowników:
+Use the `user.js` script to add or update users:
 
 ```bash
-node user.js --user <login> --password <hasło>
+node user.js --user <login> --password <password>
 ```
 
-Przykład:
+Example:
 ```bash
-node user.js --user joplin --password tajnehaslo
+node user.js --user joplin --password secretpassword
 ```
 
-Skrypt automatycznie generuje losowy salt i hashuje hasło (pbkdf2, 100 000 iteracji, SHA-512), a następnie zapisuje użytkownika w pliku `users.json`. Jeśli użytkownik już istnieje, jego hasło zostanie zaktualizowane.
+The script automatically generates a random salt and hashes the password (pbkdf2, 100,000 iterations, SHA-512), then saves the user to `users.json`. If the user already exists, the password will be updated.
 
-### Domyślni użytkownicy
+### Default Users
 
-| Login | Hasło |
-|-------|-------|
+| Login | Password |
+|-------|----------|
 | user | user |
 
-## Konfiguracja Joplin
+## Joplin Configuration
 
-W Joplin: **Preferencje** → **Synchronizacja**:
-- **Typ synchronizacji**: WebDAV
-- **Serwer WebDAV**: `https://drive.DOMAIN.pl`
-- **Nazwa użytkownika**: `joplin`
-- **Hasło**: `USTAWIONE_HASLO`
+In Joplin: **Preferences** → **Synchronization**:
+- **Sync target**: WebDAV
+- **WebDAV URL**: `https://drive.DOMAIN.pl`
+- **Username**: `joplin`
+- **Password**: `YOUR_PASSWORD`
 
-## Zmienne środowiskowe
+## Environment Variables
 
-| Zmienna | Domyślnie | Opis |
-|---------|-----------|------|
-| PORT | 3000 | Port nasłuchiwania (na mydevil.net ustawiany przez Passengera) |
-| HOST | 127.0.0.1 | Adres IP do bindowania |
-| WEBDAV_ROOT | ./data | Katalog z danymi WebDAV |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| PORT | 3000 | Listening port (on mydevil.net set by Passenger) |
+| HOST | 127.0.0.1 | Bind IP address |
+| WEBDAV_ROOT | ./data | WebDAV data directory |
 
-## Metody WebDAV
+## WebDAV Methods
 
-Serwer obsługuje: OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, PROPFIND, PROPPATCH, COPY, MOVE
+The server supports: OPTIONS, GET, HEAD, PUT, DELETE, MKCOL, PROPFIND, PROPPATCH, COPY, MOVE
