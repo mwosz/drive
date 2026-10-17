@@ -26,6 +26,8 @@ pnpm run build
 
 Kompilacja TypeScript wygeneruje folder `dist/` z plikami JavaScript gotowymi do uruchomienia.
 
+> **Uwaga dotycząca bezpieczeństwa:** Dane logowania użytkownika/hasło w pliku `users.json.example` służą wyłącznie do celów demonstracyjnych. Przed wdrożeniem serwera utwórz własny plik `users.json` i zamień przykładowe dane na silne, unikalne hasła. Nigdy nie commituj rzeczywistego pliku `users.json` do repozytorium.
+
 ### 2. Dodanie strony WWW
 
 W panelu DevilWEB dodaj stronę WWW typu **Node.js** dla domeny (np. `drive.DOMAIN.pl`).

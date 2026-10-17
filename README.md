@@ -26,6 +26,8 @@ pnpm run build
 
 The TypeScript compilation will generate the `dist/` folder with JavaScript files ready to run.
 
+> **Security note:** The user/password credentials in `users.json.example` are provided for demonstration purposes only. Before deploying the server, create your own `users.json` file and replace the example credentials with strong, unique passwords. Never commit your actual `users.json` file to the repository.
+
 ### 2. Add a Web Page
 
 In the DevilWEB panel, add a **Node.js** web page for your domain (e.g. `drive.DOMAIN.pl`).

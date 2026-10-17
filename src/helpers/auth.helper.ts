@@ -34,15 +34,18 @@ const USERS_FILE = path.join(PROJECT_ROOT, 'users.json');
 export function loadUsers(callback: (users: Array<{ user: string; salt: string; hash: string }>) => void): void {
   fs.readFile(USERS_FILE, 'utf-8', (err, data) => {
     if (err) {
-      console.error('Failed to load users file:', err.message);
-      callback([]);
+      console.error('FATAL: Failed to load users file:', err.message);
+      console.error('Please create a users.json file before starting the server.');
+      console.error('Use "node user.js --user <login> --password <password>" to create users.');
+      process.exit(1);
       return;
     }
     try {
-      callback(JSON.parse(data));
+      const users = JSON.parse(data);
+      callback(users);
     } catch (parseErr: any) {
-      console.error('Failed to parse users file:', parseErr.message);
-      callback([]);
+      console.error('FATAL: Failed to parse users file:', parseErr.message);
+      process.exit(1);
     }
   });
 }
